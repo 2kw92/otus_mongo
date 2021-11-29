@@ -97,8 +97,8 @@ security:
 #auditLog:
 
 #snmp:
-```
-```
+```     
+
 После этого сделав рестарт сервера пробуем подключиться без указания авторизации:       
 ```
 root@mongodb:~# mongo --port 27017
@@ -109,8 +109,6 @@ MongoDB server version: 5.0.4
 Warning: the "mongo" shell has been superseded by "mongosh",
 which delivers improved usability and compatibility.The "mongo" shell has been deprecated and will be removed in
 an upcoming release.
-For installation instructions, see
-https://docs.mongodb.com/mongodb-shell/install/
 > show databases
 >
 bye
@@ -125,8 +123,6 @@ MongoDB server version: 5.0.4
 Warning: the "mongo" shell has been superseded by "mongosh",
 which delivers improved usability and compatibility.The "mongo" shell has been deprecated and will be removed in
 an upcoming release.
-For installation instructions, see
-https://docs.mongodb.com/mongodb-shell/install/
 > show databases
 admin   0.000GB
 config  0.000GB
