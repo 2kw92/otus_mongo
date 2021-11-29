@@ -106,31 +106,27 @@ MongoDB shell version v5.0.4
 connecting to: mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb
 Implicit session: session { "id" : UUID("d370a46c-1a9c-414a-b560-bd6d3dc38723") }
 MongoDB server version: 5.0.4
-================
 Warning: the "mongo" shell has been superseded by "mongosh",
 which delivers improved usability and compatibility.The "mongo" shell has been deprecated and will be removed in
 an upcoming release.
 For installation instructions, see
 https://docs.mongodb.com/mongodb-shell/install/
-================
 > show databases
 >
 bye
 ```       
-Видно что без авторизации нам ничего недоступно.
+Видно что без авторизации нам ничего недоступно.     
 ```
 root@mongodb:~# mongo --port 27017 -u root -p otus --authenticationDatabase admin
 MongoDB shell version v5.0.4
 connecting to: mongodb://127.0.0.1:27017/?authSource=admin&compressors=disabled&gssapiServiceName=mongodb
 Implicit session: session { "id" : UUID("fced72a2-8fbe-49d1-a05c-59947b4d04cd") }
 MongoDB server version: 5.0.4
-================
 Warning: the "mongo" shell has been superseded by "mongosh",
 which delivers improved usability and compatibility.The "mongo" shell has been deprecated and will be removed in
 an upcoming release.
 For installation instructions, see
 https://docs.mongodb.com/mongodb-shell/install/
-================
 > show databases
 admin   0.000GB
 config  0.000GB
