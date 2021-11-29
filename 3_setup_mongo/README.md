@@ -51,7 +51,7 @@ switched to db admin
 > db.createUser( { user: "root", pwd: "otus", roles: [ "userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase" ] } )
 ```       
 После все манипуляций для того чтобы mongo работало с авторизацией и была открыта во вне      
-файл конфигурации должен выглядеть следующим образом:         
+файл конфигурации должен выглядеть следующим образом (`добавляем security:authorization: enabled и bindIpAll: true`):         
 ```
 # mongod.conf
 
