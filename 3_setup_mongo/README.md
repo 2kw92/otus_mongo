@@ -1,7 +1,7 @@
 # install mongo_db
 ДЗ отус по установке mongodb     
 
-- Создал проект  Google Cloud Platform доступен по ссылке:      
+Создал проект  Google Cloud Platform доступен по ссылке:      
 https://console.cloud.google.com/iam-admin/settings?project=mongo2021-19920819       
 Создал новую вируталку с ubuntu-2104-hirsute-v20211119	на борту.         
 Добавил свой ключ ssh в GCE metadata и подключился под пользователем root со своей        
