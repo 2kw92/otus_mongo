@@ -1,7 +1,7 @@
 # cap mongo_db
 ДЗ отус теореме CAP в отношении mongodb     
 
-Изучив материалы лекции а так же материалы доступные по ссылкам:      
+Изучив материалы лекции, а так же материалы доступные по ссылкам:      
 ```
 https://www.ibm.com/ru-ru/cloud/learn/cap-theorem#toc--cap-cp----oVh3rgM9
 https://habr.com/ru/post/328792/
