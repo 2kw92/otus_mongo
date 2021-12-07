@@ -1,7 +1,7 @@
 # CRUD mongo_db
 ДЗ отус по основным командам mongodb     
 
-В качестве тестовых данных был выбран датасет доступный по адресу:        
+В качестве тестовых данных был выбран датасет содержащий информацию о вине доступный по адресу:        
 `https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv`      
 
 После того как он был скачан, импортируем его в бд otus на машине  mongodb в GCP по адресу:       
@@ -46,5 +46,86 @@ switched to db otus
 { "_id" : ObjectId("61ae276360b74fc4d4ae801d"), "fixed acidity" : 11.2, "volatile acidity" : 0.28, "citric acid" : 0.56, "residual sugar" : 1.9, "chlorides" : 0.075, "free sulfur dioxide" : 17, "total sulfur dioxide" : 60, "density" : 0.998, "pH" : 3.16, "sulphates" : 0.58, "alcohol" : 9.8, "quality" : 6 }
 { "_id" : ObjectId("61ae276360b74fc4d4ae801e"), "fixed acidity" : 7.4, "volatile acidity" : 0.7, "citric acid" : 0, "residual sugar" : 1.9, "chlorides" : 0.076, "free sulfur dioxide" : 11, "total sulfur dioxide" : 34, "density" : 0.9978, "pH" : 3.51, "sulphates" : 0.56, "alcohol" : 9.4, "quality" : 5 }
 ```           
-Видим что все отображается.
+Видим что лимит работает корректно и отображает данные.        
 
+Посомторим количество вин, определенной крепости:      
+```
+> db.vine.aggregate([{$group : {_id: "$alcohol", count_vine : {$sum : 1}}} ] )
+{ "_id" : 9.3, "count_vine" : 59 }
+{ "_id" : 9.95, "count_vine" : 1 }
+{ "_id" : 11.0666666666667, "count_vine" : 1 }
+{ "_id" : 9.5, "count_vine" : 139 }
+{ "_id" : 12.2, "count_vine" : 12 }
+{ "_id" : 12.7, "count_vine" : 9 }
+{ "_id" : 11.95, "count_vine" : 1 }
+{ "_id" : 10.0333333333333, "count_vine" : 2 }
+{ "_id" : 8.8, "count_vine" : 2 }
+{ "_id" : 9.05, "count_vine" : 1 }
+{ "_id" : 9.23333333333333, "count_vine" : 1 }
+{ "_id" : 13.2, "count_vine" : 1 }
+{ "_id" : 9, "count_vine" : 30 }
+{ "_id" : 13.5666666666667, "count_vine" : 1 }
+{ "_id" : 8.4, "count_vine" : 2 }
+{ "_id" : 13.6, "count_vine" : 4 }
+{ "_id" : 10.5, "count_vine" : 67 }
+{ "_id" : 9.25, "count_vine" : 1 }
+{ "_id" : 10.7, "count_vine" : 27 }
+{ "_id" : 12.9, "count_vine" : 9 }
+```       
+
+Теперь давайте обновим крепость у вина с `_id=ObjectId("61ae276360b74fc4d4ae801e")`      
+```
+> db.vine.find({"_id" : ObjectId("61ae276360b74fc4d4ae801e")})
+{ "_id" : ObjectId("61ae276360b74fc4d4ae801e"), "fixed acidity" : 7.4, "volatile acidity" : 0.7, "citric acid" : 0, "residual sugar" : 1.9, "chlorides" : 0.076, "free sulfur dioxide" : 11, "total sulfur dioxide" : 34, "density" : 0.9978, "pH" : 3.51, "sulphates" : 0.56, "alcohol" : 9.4, "quality" : 5 }
+
+> db.vine.update({"_id" : ObjectId("61ae276360b74fc4d4ae801e")},{$set: {"alcohol":10}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+> db.vine.find({"_id" : ObjectId("61ae276360b74fc4d4ae801e")})
+{ "_id" : ObjectId("61ae276360b74fc4d4ae801e"), "fixed acidity" : 7.4, "volatile acidity" : 0.7, "citric acid" : 0, "residual sugar" : 1.9, "chlorides" : 0.076, "free sulfur dioxide" : 11, "total sulfur dioxide" : 34, "density" : 0.9978, "pH" : 3.51, "sulphates" : 0.56, "alcohol" : 10, "quality" : 5 } 
+```      
+Видим что данные успешно обновились.       
+
+Теперь обновим несколько документов. Например мы хотим quality у всех вин у которых pH строго меньше 2.9
+```
+> db.vine.update({"pH" : {$lt : 2.9}},{$set : {"quality":9}},{multi : true})
+WriteResult({ "nMatched" : 9, "nUpserted" : 0, "nModified" : 9 })
+```      
+И теперь проверяем:
+```
+> db.vine.find({"pH" : {$lt : 2.9}},{pH :1 , quality:1, _id : 0 })
+```
+{ "pH" : 2.74, "quality" : 9 }
+{ "pH" : 2.88, "quality" : 9 }
+{ "pH" : 2.86, "quality" : 9 }
+{ "pH" : 2.87, "quality" : 9 }
+{ "pH" : 2.89, "quality" : 9 }
+{ "pH" : 2.89, "quality" : 9 }
+{ "pH" : 2.89, "quality" : 9 }
+{ "pH" : 2.89, "quality" : 9 }
+{ "pH" : 2.88, "quality" : 9 }
+```
+Видим что данные успешно обновились.
+
+
+Теперь я хочу удалить все элементый у которых "citric acid" <=1. Для этого выполняю запрос:
+```
+> db.vine.deleteMany({"citric acid" : {$lte : 1}})
+{ "acknowledged" : true, "deletedCount" : 1599 }
+```
+Так получилось что этим запросом мы удалили все данные из колекции.Тепеь можно удлаить и саму коллекцию        
+```
+> db.vine.drop();
+true
+```
+
+И удалить саму базу
+```
+> db.dropDatabase()
+{ "ok" : 1 }
+> show dbs
+admin   0.000GB
+config  0.000GB
+local   0.000GB
+```
+Таким образом мы оттачили навыки работы с CRUD в Mongodb
