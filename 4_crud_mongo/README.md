@@ -86,7 +86,7 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 ```      
 Видим что данные успешно обновились.       
 
-Теперь обновим несколько документов. Например мы хотим quality у всех вин у которых pH строго меньше 2.9
+Теперь обновим несколько документов. Например мы хотим обновить quality у всех вин у которых pH строго меньше 2.9
 ```
 > db.vine.update({"pH" : {$lt : 2.9}},{$set : {"quality":9}},{multi : true})
 WriteResult({ "nMatched" : 9, "nUpserted" : 0, "nModified" : 9 })
