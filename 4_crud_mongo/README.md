@@ -94,7 +94,6 @@ WriteResult({ "nMatched" : 9, "nUpserted" : 0, "nModified" : 9 })
 И теперь проверяем:
 ```
 > db.vine.find({"pH" : {$lt : 2.9}},{pH :1 , quality:1, _id : 0 })
-```
 { "pH" : 2.74, "quality" : 9 }
 { "pH" : 2.88, "quality" : 9 }
 { "pH" : 2.86, "quality" : 9 }
