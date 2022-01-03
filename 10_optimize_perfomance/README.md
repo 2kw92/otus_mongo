@@ -60,7 +60,7 @@ db.setProfilingLevel(2)
 db.system.profile.find().sort({$natural:-1});
 ```
 Получим следующий вывод        
-```
+```     
 { "op" : "query", "ns" : "otus.system.profile", "command" : { "find" : "system.profile", "filter" : {  }, "sort" : { "$natural" : -1 }, "lsid" : { "id" : UUID("fb3489bf-228d-434d-8313-2845970698fe") }, "$db" : "otus" }, "keysExamined" : 0, "docsExamined" : 15, "cursorExhausted" : true, "numYield" : 0, "nreturned" : 15, "locks" : { "Global" : { "acquireCount" : { "r" : NumberLong(1) } }, "Mutex" : { "acquireCount" : { "r" : NumberLong(1) } } }, "flowControl" : {  }, "responseLength" : 11606, "protocol" : "op_msg", "millis" : 0, "planSummary" : "COLLSCAN", "execStats" : { "stage" : "COLLSCAN", "nReturned" : 15, "executionTimeMillisEstimate" : 0, "works" : 17, "advanced" : 15, "needTime" : 1, "needYield" : 0, "saveState" : 0, "restoreState" : 0, "isEOF" : 1, "direction" : "backward", "docsExamined" : 15 }, "ts" : ISODate("2022-01-02T15:39:51.956Z"), "client" : "127.0.0.1", "appName" : "MongoDB Shell", "allUsers" : [ { "user" : "root", "db" : "admin" } ], "user" : "root@admin" }
 { "op" : "query", "ns" : "otus.system.profile", "command" : { "find" : "system.profile", "filter" : {  }, "sort" : { "$natural" : -1 }, "lsid" : { "id" : UUID("fb3489bf-228d-434d-8313-2845970698fe") }, "$db" : "otus" }, "keysExamined" : 0, "docsExamined" : 14, "cursorExhausted" : true, "numYield" : 0, "nreturned" : 14, "locks" : { "Global" : { "acquireCount" : { "r" : NumberLong(1) } }, "Mutex" : { "acquireCount" : { "r" : NumberLong(1) } } }, "flowControl" : {  }, "responseLength" : 10789, "protocol" : "op_msg", "millis" : 0, "planSummary" : "COLLSCAN", "execStats" : { "stage" : "COLLSCAN", "nReturned" : 14, "executionTimeMillisEstimate" : 0, "works" : 16, "advanced" : 14, "needTime" : 1, "needYield" : 0, "saveState" : 0, "restoreState" : 0, "isEOF" : 1, "direction" : "backward", "docsExamined" : 14 }, "ts" : ISODate("2022-01-02T15:38:45.708Z"), "client" : "127.0.0.1", "appName" : "MongoDB Shell", "allUsers" : [ { "user" : "root", "db" : "admin" } ], "user" : "root@admin" }
 { "op" : "command", "ns" : "otus.vine", "command" : { "explain" : { "find" : "vine", "filter" : { "pH" : { "$lt" : 3 } }, "projection" : { "pH" : 1, "quality" : 1, "_id" : 0 } }, "verbosity" : "queryPlanner", "lsid" : { "id" : UUID("fb3489bf-228d-434d-8313-2845970698fe") }, "$db" : "otus" }, "numYield" : 0, "locks" : { "Global" : { "acquireCount" : { "r" : NumberLong(1) } }, "Mutex" : { "acquireCount" : { "r" : NumberLong(1) } } }, "flowControl" : {  }, "responseLength" : 1183, "protocol" : "op_msg", "millis" : 0, "ts" : ISODate("2022-01-02T15:38:37.378Z"), "client" : "127.0.0.1", "appName" : "MongoDB Shell", "allUsers" : [ { "user" : "root", "db" : "admin" } ], "user" : "root@admin" }
@@ -141,8 +141,8 @@ Type "it" for more
 }
 ```      
 
-Теперь посомтрим на время выполнения запроса по поиску вин по хлоридам без индекса:    
-
+Теперь посмотрим на время выполнения запроса по поиску вин по хлоридам без индекса:        
+```     
 > db.vine.explain("executionStats").find({"chlorides" : 0.078})
 {
         "explainVersion" : "1",
