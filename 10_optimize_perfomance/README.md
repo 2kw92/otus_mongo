@@ -356,5 +356,282 @@ Type "it" for more
 }
 ```
 
-Видим что индекс ускорил работу `"needTime" : 0` и теперь у нас `"stage" : "IXSCAN"`        
+Видим что индекс ускорил работу `"needTime" : 0` и теперь у нас `"stage" : "IXSCAN"`       
+
+Рассмотрим еще один запрос, по 2 условиям:        
+```
+> db.vine.explain("executionStats").find({ $and: [{"density" : 0.998},{"sulphates" : 0.51}]})
+{
+        "explainVersion" : "1",
+        "queryPlanner" : {
+                "namespace" : "otus.vine",
+                "indexFilterSet" : false,
+                "parsedQuery" : {
+                        "$and" : [
+                                {
+                                        "density" : {
+                                                "$eq" : 0.998
+                                        }
+                                },
+                                {
+                                        "sulphates" : {
+                                                "$eq" : 0.51
+                                        }
+                                }
+                        ]
+                },
+                "maxIndexedOrSolutionsReached" : false,
+                "maxIndexedAndSolutionsReached" : false,
+                "maxScansToExplodeReached" : false,
+                "winningPlan" : {
+                        "stage" : "COLLSCAN",
+                        "filter" : {
+                                "$and" : [
+                                        {
+                                                "density" : {
+                                                        "$eq" : 0.998
+                                                }
+                                        },
+                                        {
+                                                "sulphates" : {
+                                                        "$eq" : 0.51
+                                                }
+                                        }
+                                ]
+                        },
+                        "direction" : "forward"
+                },
+                "rejectedPlans" : [ ]
+        },
+        "executionStats" : {
+                "executionSuccess" : true,
+                "nReturned" : 2,
+                "executionTimeMillis" : 1,
+                "totalKeysExamined" : 0,
+                "totalDocsExamined" : 1599,
+                "executionStages" : {
+                        "stage" : "COLLSCAN",
+                        "filter" : {
+                                "$and" : [
+                                        {
+                                                "density" : {
+                                                        "$eq" : 0.998
+                                                }
+                                        },
+                                        {
+                                                "sulphates" : {
+                                                        "$eq" : 0.51
+                                                }
+                                        }
+                                ]
+                        },
+                        "nReturned" : 2,
+                        "executionTimeMillisEstimate" : 0,
+                        "works" : 1601,
+                        "advanced" : 2,
+                        "needTime" : 1598,
+                        "needYield" : 0,
+                        "saveState" : 1,
+                        "restoreState" : 1,
+                        "isEOF" : 1,
+                        "direction" : "forward",
+                        "docsExamined" : 1599
+                }
+        },
+        "command" : {
+                "find" : "vine",
+                "filter" : {
+                        "$and" : [
+                                {
+                                        "density" : 0.998
+                                },
+                                {
+                                        "sulphates" : 0.51
+                                }
+                        ]
+                },
+                "$db" : "otus"
+        },
+        "serverInfo" : {
+                "host" : "mongodb",
+                "port" : 27017,
+                "version" : "5.0.4",
+                "gitVersion" : "62a84ede3cc9a334e8bc82160714df71e7d3a29e"
+        },
+        "serverParameters" : {
+                "internalQueryFacetBufferSizeBytes" : 104857600,
+                "internalQueryFacetMaxOutputDocSizeBytes" : 104857600,
+                "internalLookupStageIntermediateDocumentMaxSizeBytes" : 104857600,
+                "internalDocumentSourceGroupMaxMemoryBytes" : 104857600,
+                "internalQueryMaxBlockingSortMemoryUsageBytes" : 104857600,
+                "internalQueryProhibitBlockingMergeOnMongoS" : 0,
+                "internalQueryMaxAddToSetBytes" : 104857600,
+                "internalDocumentSourceSetWindowFieldsMaxMemoryBytes" : 104857600
+        },
+        "ok" : 1
+}
+```
+Видим `"needTime" : 1598`    
+Теперь создадим составной индекс:       
+```
+> db.vine.createIndex({density : 1, sulphates : 1})
+{
+        "numIndexesBefore" : 2,
+        "numIndexesAfter" : 3,
+        "createdCollectionAutomatically" : false,
+        "ok" : 1
+}
+```
+
+И теперь посмотрим на план выполнения запросов:
+```
+> db.vine.explain("executionStats").find({ $and: [{"density" : 0.998},{"sulphates" : 0.51}]})
+{
+        "explainVersion" : "1",
+        "queryPlanner" : {
+                "namespace" : "otus.vine",
+                "indexFilterSet" : false,
+                "parsedQuery" : {
+                        "$and" : [
+                                {
+                                        "density" : {
+                                                "$eq" : 0.998
+                                        }
+                                },
+                                {
+                                        "sulphates" : {
+                                                "$eq" : 0.51
+                                        }
+                                }
+                        ]
+                },
+                "maxIndexedOrSolutionsReached" : false,
+                "maxIndexedAndSolutionsReached" : false,
+                "maxScansToExplodeReached" : false,
+                "winningPlan" : {
+                        "stage" : "FETCH",
+                        "inputStage" : {
+                                "stage" : "IXSCAN",
+                                "keyPattern" : {
+                                        "density" : 1,
+                                        "sulphates" : 1
+                                },
+                                "indexName" : "density_1_sulphates_1",
+                                "isMultiKey" : false,
+                                "multiKeyPaths" : {
+                                        "density" : [ ],
+                                        "sulphates" : [ ]
+                                },
+                                "isUnique" : false,
+                                "isSparse" : false,
+                                "isPartial" : false,
+                                "indexVersion" : 2,
+                                "direction" : "forward",
+                                "indexBounds" : {
+                                        "density" : [
+                                                "[0.998, 0.998]"
+                                        ],
+                                        "sulphates" : [
+                                                "[0.51, 0.51]"
+                                        ]
+                                }
+                        }
+                },
+                "rejectedPlans" : [ ]
+        },
+        "executionStats" : {
+                "executionSuccess" : true,
+                "nReturned" : 2,
+                "executionTimeMillis" : 1,
+                "totalKeysExamined" : 2,
+                "totalDocsExamined" : 2,
+                "executionStages" : {
+                        "stage" : "FETCH",
+                        "nReturned" : 2,
+                        "executionTimeMillisEstimate" : 0,
+                        "works" : 3,
+                        "advanced" : 2,
+                        "needTime" : 0,
+                        "needYield" : 0,
+                        "saveState" : 0,
+                        "restoreState" : 0,
+                        "isEOF" : 1,
+                        "docsExamined" : 2,
+                        "alreadyHasObj" : 0,
+                        "inputStage" : {
+                                "stage" : "IXSCAN",
+                                "nReturned" : 2,
+                                "executionTimeMillisEstimate" : 0,
+                                "works" : 3,
+                                "advanced" : 2,
+                                "needTime" : 0,
+                                "needYield" : 0,
+                                "saveState" : 0,
+                                "restoreState" : 0,
+                                "isEOF" : 1,
+                                "keyPattern" : {
+                                        "density" : 1,
+                                        "sulphates" : 1
+                                },
+                                "indexName" : "density_1_sulphates_1",
+                                "isMultiKey" : false,
+                                "multiKeyPaths" : {
+                                        "density" : [ ],
+                                        "sulphates" : [ ]
+                                },
+                                "isUnique" : false,
+                                "isSparse" : false,
+                                "isPartial" : false,
+                                "indexVersion" : 2,
+                                "direction" : "forward",
+                                "indexBounds" : {
+                                        "density" : [
+                                                "[0.998, 0.998]"
+                                        ],
+                                        "sulphates" : [
+                                                "[0.51, 0.51]"
+                                        ]
+                                },
+                                "keysExamined" : 2,
+                                "seeks" : 1,
+                                "dupsTested" : 0,
+                                "dupsDropped" : 0
+                        }
+                }
+        },
+        "command" : {
+                "find" : "vine",
+                "filter" : {
+                        "$and" : [
+                                {
+                                        "density" : 0.998
+                                },
+                                {
+                                        "sulphates" : 0.51
+                                }
+                        ]
+                },
+                "$db" : "otus"
+        },
+        "serverInfo" : {
+                "host" : "mongodb",
+                "port" : 27017,
+                "version" : "5.0.4",
+                "gitVersion" : "62a84ede3cc9a334e8bc82160714df71e7d3a29e"
+        },
+        "serverParameters" : {
+                "internalQueryFacetBufferSizeBytes" : 104857600,
+                "internalQueryFacetMaxOutputDocSizeBytes" : 104857600,
+                "internalLookupStageIntermediateDocumentMaxSizeBytes" : 104857600,
+                "internalDocumentSourceGroupMaxMemoryBytes" : 104857600,
+                "internalQueryMaxBlockingSortMemoryUsageBytes" : 104857600,
+                "internalQueryProhibitBlockingMergeOnMongoS" : 0,
+                "internalQueryMaxAddToSetBytes" : 104857600,
+                "internalDocumentSourceSetWindowFieldsMaxMemoryBytes" : 104857600
+        },
+        "ok" : 1
+}
+```
+Видим что `"needTime" : 0`    
+
 Таким образом мы посомтрели на работу индексов и планировщик запросов.
