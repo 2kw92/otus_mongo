@@ -395,7 +395,8 @@ root@mongo1:/var/lib# mongo --port 27011
         },
         "operationTime" : Timestamp(1642500440, 1)
 ```
-Проверим статус:        
+Проверим статус:
+```        
 rs1:PRIMARY> rs.status()
 {
         "set" : "rs1",
@@ -792,6 +793,9 @@ mongos> sh.status()
 mongos>
 ```
 
-Мы построили шардированный кластер.      
+Мы построили шардированный кластер.    
+
+Теперь загрузим данные. Будем подгружать геоданные содержащий информацию об интересных местах Тулузы.      
 
 
+mongoimport -d geodb -c church_polygon2 --jsonArray  -u root --authenticationDatabase admin --file /root/church_polygon_edit.geojson
