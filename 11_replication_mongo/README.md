@@ -795,7 +795,445 @@ mongos>
 
 Мы построили шардированный кластер.    
 
-Теперь загрузим данные. Будем подгружать геоданные содержащий информацию об интересных местах Тулузы.      
+Теперь скачаем и загрузим данные.      
+```
+root@mongo1:~# wget https://dl.dropboxusercontent.com/s/p75zp1karqg6nnn/stocks.zip
+--2022-01-19 13:12:39--  https://dl.dropboxusercontent.com/s/p75zp1karqg6nnn/stocks.zip
+Resolving dl.dropboxusercontent.com (dl.dropboxusercontent.com)... 162.125.3.15, 2620:100:601b:15::a27d:80f
+Connecting to dl.dropboxusercontent.com (dl.dropboxusercontent.com)|162.125.3.15|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 88115591 (84M) [application/zip]
+Saving to: ‘stocks.zip’
+
+stocks.zip                            100%[========================================================================>]  84.03M  32.7MB/s    in 2.6s
+
+2022-01-19 13:12:42 (32.7 MB/s) - ‘stocks.zip’ saved [88115591/88115591]
+
+root@mongo1:~# unzip -qo stocks.zip
+root@mongo1:~# mongorestore -d otus -h mongo4:27000  -u userroot --authenticationDatabase admin /root/dump/stocks/values.bson                          Enter password:
+
+2022-01-19T13:15:32.008+0000    checking for collection data in /root/dump/stocks/values.bson
+2022-01-19T13:15:32.072+0000    restoring otus.values from /root/dump/stocks/values.bson
+2022-01-19T13:15:35.010+0000    [........................]  otus.values  23.2MB/715MB  (3.2%)
+2022-01-19T13:15:38.006+0000    [#.......................]  otus.values  45.0MB/715MB  (6.3%)
+2022-01-19T13:15:41.006+0000    [##......................]  otus.values  65.6MB/715MB  (9.2%)
+2022-01-19T13:15:44.006+0000    [##......................]  otus.values  86.4MB/715MB  (12.1%)
+2022-01-19T13:15:47.006+0000    [###.....................]  otus.values  111MB/715MB  (15.5%)
+2022-01-19T13:15:50.005+0000    [####....................]  otus.values  131MB/715MB  (18.3%)
+2022-01-19T13:15:53.006+0000    [#####...................]  otus.values  154MB/715MB  (21.5%)
+2022-01-19T13:15:56.005+0000    [#####...................]  otus.values  175MB/715MB  (24.4%)
+2022-01-19T13:15:59.007+0000    [######..................]  otus.values  198MB/715MB  (27.7%)
+2022-01-19T13:16:02.013+0000    [#######.................]  otus.values  221MB/715MB  (30.8%)
+2022-01-19T13:16:05.009+0000    [#######.................]  otus.values  238MB/715MB  (33.3%)
+2022-01-19T13:16:08.006+0000    [########................]  otus.values  257MB/715MB  (36.0%)
+2022-01-19T13:16:11.008+0000    [#########...............]  otus.values  280MB/715MB  (39.2%)
+2022-01-19T13:16:14.006+0000    [##########..............]  otus.values  303MB/715MB  (42.3%)
+2022-01-19T13:16:17.006+0000    [##########..............]  otus.values  326MB/715MB  (45.5%)
+2022-01-19T13:16:20.005+0000    [###########.............]  otus.values  347MB/715MB  (48.5%)
+2022-01-19T13:16:23.009+0000    [############............]  otus.values  369MB/715MB  (51.6%)
+2022-01-19T13:16:26.006+0000    [#############...........]  otus.values  391MB/715MB  (54.6%)
+2022-01-19T13:16:29.011+0000    [#############...........]  otus.values  412MB/715MB  (57.6%)
+2022-01-19T13:16:32.006+0000    [##############..........]  otus.values  436MB/715MB  (61.0%)
+2022-01-19T13:16:35.006+0000    [###############.........]  otus.values  453MB/715MB  (63.3%)
+2022-01-19T13:16:38.006+0000    [###############.........]  otus.values  472MB/715MB  (66.0%)
+2022-01-19T13:16:41.013+0000    [################........]  otus.values  492MB/715MB  (68.8%)
+2022-01-19T13:16:44.006+0000    [#################.......]  otus.values  515MB/715MB  (72.1%)
+2022-01-19T13:16:47.006+0000    [##################......]  otus.values  537MB/715MB  (75.1%)
+2022-01-19T13:16:50.006+0000    [##################......]  otus.values  555MB/715MB  (77.6%)
+2022-01-19T13:16:53.006+0000    [###################.....]  otus.values  575MB/715MB  (80.4%)
+2022-01-19T13:16:56.005+0000    [####################....]  otus.values  599MB/715MB  (83.7%)
+2022-01-19T13:16:59.006+0000    [####################....]  otus.values  616MB/715MB  (86.1%)
+2022-01-19T13:17:02.006+0000    [#####################...]  otus.values  637MB/715MB  (89.1%)
+2022-01-19T13:17:05.007+0000    [######################..]  otus.values  658MB/715MB  (92.0%)
+2022-01-19T13:17:08.006+0000    [######################..]  otus.values  680MB/715MB  (95.0%)
+2022-01-19T13:17:11.006+0000    [#######################.]  otus.values  702MB/715MB  (98.1%)
+2022-01-19T13:17:12.783+0000    [########################]  otus.values  715MB/715MB  (100.0%)
+2022-01-19T13:17:12.783+0000    finished restoring otus.values (4308303 documents, 0 failures)
+2022-01-19T13:17:12.783+0000    4308303 document(s) restored successfully. 0 document(s) failed to restore.
+
+```      
 
 
-mongoimport -d geodb -c church_polygon2 --jsonArray  -u root --authenticationDatabase admin --file /root/church_polygon_edit.geojson
+Теперь создадим индекс и сделаем бд шардированной:
+```
+mongos> db.values.createIndex({stock_symbol: 1})
+{
+        "raw" : {
+                "rs3/mongo1:27031,mongo2:27031,mongo3:27031" : {
+                        "numIndexesBefore" : 1,
+                        "numIndexesAfter" : 2,
+                        "createdCollectionAutomatically" : false,
+                        "commitQuorum" : "votingMembers",
+                        "ok" : 1
+                }
+        },
+        "ok" : 1,
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1642598372, 4),
+                "signature" : {
+                        "hash" : BinData(0,"3v+/3hFcajt5p5VNvOOp9wAq5Lo="),
+                        "keyId" : NumberLong("7054507337280651287")
+                }
+        },
+        "operationTime" : Timestamp(1642598372, 4)
+}
+mongos> sh.enableSharding("otus")
+{
+        "ok" : 1,
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1642598396, 2),
+                "signature" : {
+                        "hash" : BinData(0,"/6n79W141oG8jeSiY/Niho4TkVs="),
+                        "keyId" : NumberLong("7054507337280651287")
+                }
+        },
+        "operationTime" : Timestamp(1642598396, 2)
+}
+mongos> sh.shardCollection("otus.values",{ stock_symbol: 1 })
+{
+        "collectionsharded" : "otus.values",
+        "ok" : 1,
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1642598418, 35),
+                "signature" : {
+                        "hash" : BinData(0,"Tqa82tkg16hxBXqferbwDykEn+M="),
+                        "keyId" : NumberLong("7054507337280651287")
+                }
+        },
+        "operationTime" : Timestamp(1642598418, 31)
+}
+
+``` 
+И паралельно посмотрим как данные будут разъежаться по шардам:
+```
+mongos> sh.status()
+--- Sharding Status ---
+  sharding version: {
+        "_id" : 1,
+        "minCompatibleVersion" : 5,
+        "currentVersion" : 6,
+        "clusterId" : ObjectId("61e6a50c7666c7fbb860e4a6")
+  }
+  shards:
+        {  "_id" : "rs1",  "host" : "rs1/mongo1:27011,mongo2:27011,mongo3:27011",  "state" : 1,  "topologyTime" : Timestamp(1642588858, 1) }
+        {  "_id" : "rs2",  "host" : "rs2/mongo1:27021,mongo2:27021,mongo3:27021",  "state" : 1,  "topologyTime" : Timestamp(1642591035, 2) }
+        {  "_id" : "rs3",  "host" : "rs3/mongo1:27031,mongo2:27031,mongo3:27031",  "state" : 1,  "topologyTime" : Timestamp(1642591128, 2) }
+  active mongoses:
+        "5.0.5" : 1
+  autosplit:
+        Currently enabled: yes
+  balancer:
+        Currently enabled: yes
+        Currently running: yes
+        Collections with active migrations:
+                otus.values started at Wed Jan 19 2022 13:20:58 GMT+0000 (UTC)
+        Failed balancer rounds in last 5 attempts: 0
+        Migration results for the last 24 hours:
+                686 : Success
+  databases:
+        {  "_id" : "config",  "primary" : "config",  "partitioned" : true }
+                config.system.sessions
+                        shard key: { "_id" : 1 }
+                        unique: false
+                        balancing: true
+                        chunks:
+                                rs1     342
+                                rs2     341
+                                rs3     341
+                        too many chunks to print, use verbose if you want to force print
+        {  "_id" : "otus",  "primary" : "rs3",  "partitioned" : true,  "version" : {  "uuid" : UUID("ffc4d3f0-2782-4545-bea3-784fd8387b09"),  "timestamp" : Timestamp(1642598131, 1),  "lastMod" : 1 } }
+                otus.values
+                        shard key: { "stock_symbol" : 1 }
+                        unique: false
+                        balancing: true
+                        chunks:
+                                rs1     2
+                                rs2     2
+                                rs3     7
+                        { "stock_symbol" : { "$minKey" : 1 } } -->> { "stock_symbol" : "AMIC" } on : rs2 Timestamp(2, 0)
+                        { "stock_symbol" : "AMIC" } -->> { "stock_symbol" : "ATRO" } on : rs1 Timestamp(3, 0)
+                        { "stock_symbol" : "ATRO" } -->> { "stock_symbol" : "BKUNA" } on : rs1 Timestamp(4, 0)
+                        { "stock_symbol" : "BKUNA" } -->> { "stock_symbol" : "CALM" } on : rs2 Timestamp(5, 0)
+                        { "stock_symbol" : "CALM" } -->> { "stock_symbol" : "CNIC" } on : rs3 Timestamp(5, 1)
+                        { "stock_symbol" : "CNIC" } -->> { "stock_symbol" : "DAGM" } on : rs3 Timestamp(1, 5)
+                        { "stock_symbol" : "DAGM" } -->> { "stock_symbol" : "ENDO" } on : rs3 Timestamp(1, 6)
+                        { "stock_symbol" : "ENDO" } -->> { "stock_symbol" : "FMBI" } on : rs3 Timestamp(1, 7)
+                        { "stock_symbol" : "FMBI" } -->> { "stock_symbol" : "MACE" } on : rs3 Timestamp(1, 8)
+                        { "stock_symbol" : "MACE" } -->> { "stock_symbol" : "MTCT" } on : rs3 Timestamp(1, 9)
+                        { "stock_symbol" : "MTCT" } -->> { "stock_symbol" : { "$maxKey" : 1 } } on : rs3 Timestamp(1, 10)
+        {  "_id" : "test",  "primary" : "rs1",  "partitioned" : true,  "version" : {  "uuid" : UUID("6179a109-5d28-4dcc-8a45-f80825148a67"),  "timestamp" : Timestamp(1642598383, 2),  "lastMod" : 1 } }
+mongos> sh.status()
+--- Sharding Status ---
+  sharding version: {
+        "_id" : 1,
+        "minCompatibleVersion" : 5,
+        "currentVersion" : 6,
+        "clusterId" : ObjectId("61e6a50c7666c7fbb860e4a6")
+  }
+  shards:
+        {  "_id" : "rs1",  "host" : "rs1/mongo1:27011,mongo2:27011,mongo3:27011",  "state" : 1,  "topologyTime" : Timestamp(1642588858, 1) }
+        {  "_id" : "rs2",  "host" : "rs2/mongo1:27021,mongo2:27021,mongo3:27021",  "state" : 1,  "topologyTime" : Timestamp(1642591035, 2) }
+        {  "_id" : "rs3",  "host" : "rs3/mongo1:27031,mongo2:27031,mongo3:27031",  "state" : 1,  "topologyTime" : Timestamp(1642591128, 2) }
+  active mongoses:
+        "5.0.5" : 1
+  autosplit:
+        Currently enabled: yes
+  balancer:
+        Currently enabled: yes
+        Currently running: no
+        Collections with active migrations:
+                otus.values started at Wed Jan 19 2022 13:21:20 GMT+0000 (UTC)
+        Failed balancer rounds in last 5 attempts: 0
+        Migration results for the last 24 hours:
+                687 : Success
+  databases:
+        {  "_id" : "config",  "primary" : "config",  "partitioned" : true }
+                config.system.sessions
+                        shard key: { "_id" : 1 }
+                        unique: false
+                        balancing: true
+                        chunks:
+                                rs1     342
+                                rs2     341
+                                rs3     341
+                        too many chunks to print, use verbose if you want to force print
+        {  "_id" : "otus",  "primary" : "rs3",  "partitioned" : true,  "version" : {  "uuid" : UUID("ffc4d3f0-2782-4545-bea3-784fd8387b09"),  "timestamp" : Timestamp(1642598131, 1),  "lastMod" : 1 } }
+                otus.values
+                        shard key: { "stock_symbol" : 1 }
+                        unique: false
+                        balancing: true
+                        chunks:
+                                rs1     2
+                                rs2     3
+                                rs3     6
+                        { "stock_symbol" : { "$minKey" : 1 } } -->> { "stock_symbol" : "AMIC" } on : rs2 Timestamp(2, 0)
+                        { "stock_symbol" : "AMIC" } -->> { "stock_symbol" : "ATRO" } on : rs1 Timestamp(3, 0)
+                        { "stock_symbol" : "ATRO" } -->> { "stock_symbol" : "BKUNA" } on : rs1 Timestamp(4, 0)
+                        { "stock_symbol" : "BKUNA" } -->> { "stock_symbol" : "CALM" } on : rs2 Timestamp(5, 0)
+                        { "stock_symbol" : "CALM" } -->> { "stock_symbol" : "CNIC" } on : rs2 Timestamp(6, 0)
+                        { "stock_symbol" : "CNIC" } -->> { "stock_symbol" : "DAGM" } on : rs3 Timestamp(6, 1)
+                        { "stock_symbol" : "DAGM" } -->> { "stock_symbol" : "ENDO" } on : rs3 Timestamp(1, 6)
+                        { "stock_symbol" : "ENDO" } -->> { "stock_symbol" : "FMBI" } on : rs3 Timestamp(1, 7)
+                        { "stock_symbol" : "FMBI" } -->> { "stock_symbol" : "MACE" } on : rs3 Timestamp(1, 8)
+                        { "stock_symbol" : "MACE" } -->> { "stock_symbol" : "MTCT" } on : rs3 Timestamp(1, 9)
+                        { "stock_symbol" : "MTCT" } -->> { "stock_symbol" : { "$maxKey" : 1 } } on : rs3 Timestamp(1, 10)
+        {  "_id" : "test",  "primary" : "rs1",  "partitioned" : true,  "version" : {  "uuid" : UUID("6179a109-5d28-4dcc-8a45-f80825148a67"),  "timestamp" : Timestamp(1642598383, 2),  "lastMod" : 1 } }
+```
+Данные разъехались по шардам.
+
+Теперь давайте остановим сервис mongod на первой ноде:
+```
+root@mongo1:~# systemctl status mongod
+● mongod.service - MongoDB Database Server
+     Loaded: loaded (/lib/systemd/system/mongod.service; disabled; vendor preset: enabled)
+     Active: inactive (dead)
+       Docs: https://docs.mongodb.org/manual
+```
+И со второй ноды проверим статус реплики:
+```
+rs0:SECONDARY> rs.status
+function() {
+    return db._adminCommand("replSetGetStatus");
+}
+rs0:SECONDARY> rs.status()
+{
+        "set" : "rs0",
+        "date" : ISODate("2022-01-19T13:31:49.510Z"),
+        "myState" : 2,
+        "term" : NumberLong(8),
+        "syncSourceHost" : "mongo3:27001",
+        "syncSourceId" : 2,
+        "configsvr" : true,
+        "heartbeatIntervalMillis" : NumberLong(2000),
+        "majorityVoteCount" : 2,
+        "writeMajorityCount" : 2,
+        "votingMembersCount" : 3,
+        "writableVotingMembersCount" : 3,
+        "optimes" : {
+                "lastCommittedOpTime" : {
+                        "ts" : Timestamp(1642599108, 263),
+                        "t" : NumberLong(8)
+                },
+                "lastCommittedWallTime" : ISODate("2022-01-19T13:31:48.347Z"),
+                "readConcernMajorityOpTime" : {
+                        "ts" : Timestamp(1642599108, 263),
+                        "t" : NumberLong(8)
+                },
+                "appliedOpTime" : {
+                        "ts" : Timestamp(1642599108, 263),
+                        "t" : NumberLong(8)
+                },
+                "durableOpTime" : {
+                        "ts" : Timestamp(1642599108, 263),
+                        "t" : NumberLong(8)
+                },
+                "lastAppliedWallTime" : ISODate("2022-01-19T13:31:48.347Z"),
+                "lastDurableWallTime" : ISODate("2022-01-19T13:31:48.347Z")
+        },
+        "lastStableRecoveryTimestamp" : Timestamp(1642599099, 1),
+        "electionParticipantMetrics" : {
+                "votedForCandidate" : true,
+                "electionTerm" : NumberLong(8),
+                "lastVoteDate" : ISODate("2022-01-19T13:21:19.614Z"),
+                "electionCandidateMemberId" : 2,
+                "voteReason" : "",
+                "lastAppliedOpTimeAtElection" : {
+                        "ts" : Timestamp(1642598468, 1),
+                        "t" : NumberLong(7)
+                },
+                "maxAppliedOpTimeInSet" : {
+                        "ts" : Timestamp(1642598468, 1),
+                        "t" : NumberLong(7)
+                },
+                "priorityAtElection" : 1,
+                "newTermStartDate" : ISODate("2022-01-19T13:21:20.463Z"),
+                "newTermAppliedDate" : ISODate("2022-01-19T13:21:20.466Z")
+        },
+        "members" : [
+                {
+                        "_id" : 0,
+                        "name" : "mongo1:27001",
+                        "health" : 0,
+                        "state" : 8,
+                        "stateStr" : "(not reachable/healthy)",
+                        "uptime" : 0,
+                        "optime" : {
+                                "ts" : Timestamp(0, 0),
+                                "t" : NumberLong(-1)
+                        },
+                        "optimeDurable" : {
+                                "ts" : Timestamp(0, 0),
+                                "t" : NumberLong(-1)
+                        },
+                        "optimeDate" : ISODate("1970-01-01T00:00:00Z"),
+                        "optimeDurableDate" : ISODate("1970-01-01T00:00:00Z"),
+                        "lastAppliedWallTime" : ISODate("2022-01-19T13:21:06.351Z"),
+                        "lastDurableWallTime" : ISODate("2022-01-19T13:21:06.351Z"),
+                        "lastHeartbeat" : ISODate("2022-01-19T13:31:49.438Z"),
+                        "lastHeartbeatRecv" : ISODate("2022-01-19T13:21:33.819Z"),
+                        "pingMs" : NumberLong(0),
+                        "lastHeartbeatMessage" : "Error connecting to mongo1:27001 (10.128.0.6:27001) :: caused by :: Connection refused",
+                        "syncSourceHost" : "",
+                        "syncSourceId" : -1,
+                        "infoMessage" : "",
+                        "configVersion" : 1,
+                        "configTerm" : 7
+                },
+                {
+                        "_id" : 1,
+                        "name" : "mongo2:27001",
+                        "health" : 1,
+                        "state" : 2,
+                        "stateStr" : "SECONDARY",
+                        "uptime" : 10399,
+                        "optime" : {
+                                "ts" : Timestamp(1642599108, 263),
+                                "t" : NumberLong(8)
+                        },
+                        "optimeDate" : ISODate("2022-01-19T13:31:48Z"),
+                        "lastAppliedWallTime" : ISODate("2022-01-19T13:31:48.347Z"),
+                        "lastDurableWallTime" : ISODate("2022-01-19T13:31:48.347Z"),
+                        "syncSourceHost" : "mongo3:27001",
+                        "syncSourceId" : 2,
+                        "infoMessage" : "",
+                        "configVersion" : 1,
+                        "configTerm" : 8,
+                        "self" : true,
+                        "lastHeartbeatMessage" : ""
+                },
+                {
+                        "_id" : 2,
+                        "name" : "mongo3:27001",
+                        "health" : 1,
+                        "state" : 1,
+                        "stateStr" : "PRIMARY",
+                        "uptime" : 10397,
+                        "optime" : {
+                                "ts" : Timestamp(1642599108, 263),
+                                "t" : NumberLong(8)
+                        },
+                        "optimeDurable" : {
+                                "ts" : Timestamp(1642599108, 263),
+                                "t" : NumberLong(8)
+                        },
+                        "optimeDate" : ISODate("2022-01-19T13:31:48Z"),
+                        "optimeDurableDate" : ISODate("2022-01-19T13:31:48Z"),
+                        "lastAppliedWallTime" : ISODate("2022-01-19T13:31:48.347Z"),
+                        "lastDurableWallTime" : ISODate("2022-01-19T13:31:48.347Z"),
+                        "lastHeartbeat" : ISODate("2022-01-19T13:31:49.338Z"),
+                        "lastHeartbeatRecv" : ISODate("2022-01-19T13:31:48.702Z"),
+                        "pingMs" : NumberLong(0),
+                        "lastHeartbeatMessage" : "",
+                        "syncSourceHost" : "",
+                        "syncSourceId" : -1,
+                        "infoMessage" : "",
+                        "electionTime" : Timestamp(1642598479, 1),
+                        "electionDate" : ISODate("2022-01-19T13:21:19Z"),
+                        "configVersion" : 1,
+                        "configTerm" : 8
+                }
+        ],
+        "ok" : 1,
+        "$gleStats" : {
+                "lastOpTime" : Timestamp(0, 0),
+                "electionId" : ObjectId("000000000000000000000000")
+        },
+        "lastCommittedOpTime" : Timestamp(1642599108, 263),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1642599108, 263),
+                "signature" : {
+                        "hash" : BinData(0,"fw/q5pfgXIdYilzLdCwO516bu/8="),
+                        "keyId" : NumberLong("7054507337280651287")
+                }
+        },
+        "operationTime" : Timestamp(1642599108, 263)
+}
+
+```
+Видим что у нас primary переехал на 3 ноду
+
+Если мы погасим сервисы отевчающие за репликасет rs1 а это сервисы mongod_1, хотя бы на 2-ух нодах, то при запросе через mongos поулчим:
+```
+mongos> db.values.count()
+uncaught exception: Error: count failed: {
+        "ok" : 0,
+        "errmsg" : "failed on: rs1 :: caused by :: Could not find host matching read preference { mode: \"primary\" } for set rs1",
+        "code" : 133,
+        "codeName" : "FailedToSatisfyReadPreference",
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1642599498, 1),
+                "signature" : {
+                        "hash" : BinData(0,"0c9JzqVu3/bpk20fNIK43EkTPnY="),
+                        "keyId" : NumberLong("7054507337280651287")
+                }
+        },
+        "operationTime" : Timestamp(1642599498, 1)
+} :
+_getErrorWithCode@src/mongo/shell/utils.js:25:13
+DBCollection.prototype.count@src/mongo/shell/collection.js:1406:15
+@(shell):1:1
+```
+
+Соотвественно если погами сервис для репликасета rs2, получим ошибку:
+```
+mongos> db.values.count()
+uncaught exception: Error: count failed: {
+        "ok" : 0,
+        "errmsg" : "failed on: rs2 :: caused by :: Could not find host matching read preference { mode: \"primary\" } for set rs2",
+        "code" : 133,
+        "codeName" : "FailedToSatisfyReadPreference",
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1642599648, 1),
+                "signature" : {
+                        "hash" : BinData(0,"RhUDzBtVdUar69XLJ0cFwXfD624="),
+                        "keyId" : NumberLong("7054507337280651287")
+                }
+        },
+        "operationTime" : Timestamp(1642599646, 2)
+} :
+_getErrorWithCode@src/mongo/shell/utils.js:25:13
+DBCollection.prototype.count@src/mongo/shell/collection.js:1406:15
+@(shell):1:1
+```
+
+Из этого можно сделать, что наш кластер может потерять по одному инстансу из каждого репликасета и оставаться в рабочем состоянии.
