@@ -1,8 +1,4 @@
-{
-"type": "FeatureCollection",
-"name": "transport_point",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
+[
 { "type": "Feature", "properties": { "osm_id": "57174446", "lastchange": "2013-09-05T23:11:13Z", "code": 5621, "fclass": "bus_stop", "geomtype": "N", "name": "Pont Saint-Michel" }, "geometry": { "type": "Point", "coordinates": [ 1.4399614, 43.5923127 ] } },
 { "type": "Feature", "properties": { "osm_id": "57202449", "lastchange": "2014-05-13T19:32:49Z", "code": 5601, "fclass": "railway_station", "geomtype": "N", "name": "Saint-Cyprien-Arènes" }, "geometry": { "type": "Point", "coordinates": [ 1.4178438, 43.5939653 ] } },
 { "type": "Feature", "properties": { "osm_id": "226181592", "lastchange": "2016-10-02T22:42:55Z", "code": 5621, "fclass": "bus_stop", "geomtype": "N", "name": null }, "geometry": { "type": "Point", "coordinates": [ 1.4393584, 43.6256126 ] } },
@@ -836,4 +832,3 @@
 { "type": "Feature", "properties": { "osm_id": "414845924", "lastchange": "2017-05-31T08:17:15Z", "code": 5622, "fclass": "bus_station", "geomtype": "W", "name": null }, "geometry": { "type": "Point", "coordinates": [ 1.418303295552462, 43.593605190565341 ] } },
 { "type": "Feature", "properties": { "osm_id": "450278466", "lastchange": "2016-10-30T23:23:25Z", "code": 5622, "fclass": "bus_station", "geomtype": "W", "name": "Gare Routière" }, "geometry": { "type": "Point", "coordinates": [ 1.452367439986911, 43.613297736633626 ] } }
 ]
-}

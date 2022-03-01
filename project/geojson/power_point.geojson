@@ -1,8 +1,4 @@
-{
-"type": "FeatureCollection",
-"name": "power_point",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
+[
 { "type": "Feature", "properties": { "osm_id": "1242368980", "lastchange": "2011-04-29T08:48:23Z", "code": 6401, "fclass": "tower", "geomtype": "N", "name": null }, "geometry": { "type": "Point", "coordinates": [ 1.4165041, 43.6339156 ] } },
 { "type": "Feature", "properties": { "osm_id": "1242368986", "lastchange": "2011-04-29T08:48:23Z", "code": 6401, "fclass": "tower", "geomtype": "N", "name": null }, "geometry": { "type": "Point", "coordinates": [ 1.4180652, 43.6193931 ] } },
 { "type": "Feature", "properties": { "osm_id": "1242368987", "lastchange": "2011-04-12T19:38:37Z", "code": 6401, "fclass": "tower", "geomtype": "N", "name": null }, "geometry": { "type": "Point", "coordinates": [ 1.4162144, 43.6311745 ] } },
@@ -42,4 +38,3 @@
 { "type": "Feature", "properties": { "osm_id": "1562762", "lastchange": "2014-02-01T18:19:00Z", "code": 6422, "fclass": "substation", "geomtype": "R", "name": null }, "geometry": { "type": "Point", "coordinates": [ 1.417979867607086, 43.617755009605844 ] } },
 { "type": "Feature", "properties": { "osm_id": "115420348", "lastchange": "2014-02-01T18:23:15Z", "code": 6422, "fclass": "substation", "geomtype": "W", "name": null }, "geometry": { "type": "Point", "coordinates": [ 1.492373054539359, 43.616446754013566 ] } }
 ]
-}

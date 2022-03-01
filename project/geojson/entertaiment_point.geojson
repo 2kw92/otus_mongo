@@ -1,8 +1,4 @@
-{
-"type": "FeatureCollection",
-"name": "entertaiment_point",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
+[
 { "type": "Feature", "properties": { "osm_id": "8831758", "lastchange": "2014-01-09T16:12:49Z", "code": 2201, "fclass": "theatre", "geomtype": "N", "name": "Théâtre Le Hangar" }, "geometry": { "type": "Point", "coordinates": [ 1.4543855, 43.6148023 ] } },
 { "type": "Feature", "properties": { "osm_id": "57197092", "lastchange": "2011-02-20T17:12:11Z", "code": 2907, "fclass": "camera_surveillance", "geomtype": "N", "name": "Capitole" }, "geometry": { "type": "Point", "coordinates": [ 1.4454371, 43.6045692 ] } },
 { "type": "Feature", "properties": { "osm_id": "60292736", "lastchange": "2015-12-07T16:22:31Z", "code": 2907, "fclass": "camera_surveillance", "geomtype": "N", "name": "Jean Jaurès" }, "geometry": { "type": "Point", "coordinates": [ 1.449752, 43.6061665 ] } },
@@ -6612,4 +6608,3 @@
 { "type": "Feature", "properties": { "osm_id": "498120027", "lastchange": "2017-06-04T22:27:14Z", "code": 2252, "fclass": "pitch", "geomtype": "W", "name": null }, "geometry": { "type": "Point", "coordinates": [ 1.4477062163015, 43.628019549537029 ] } },
 { "type": "Feature", "properties": { "osm_id": "498828699", "lastchange": "2017-06-07T10:42:57Z", "code": 2252, "fclass": "pitch", "geomtype": "W", "name": null }, "geometry": { "type": "Point", "coordinates": [ 1.473470492311428, 43.616445085762393 ] } }
 ]
-}
