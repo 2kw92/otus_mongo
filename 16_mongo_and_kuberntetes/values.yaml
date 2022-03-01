@@ -1,0 +1,352 @@
+architecture: replicaset
+## @param useStatefulSet Set to true to use a StatefulSet instead of a Deployment (only when `architecture=standalone`)
+##
+useStatefulSet: true
+## MongoDB(&reg;) Authentication parameters
+##
+auth:
+  ## @param auth.enabled Enable authentication
+  ## ref: https://docs.mongodb.com/manual/tutorial/enable-authentication/
+  ##
+  enabled: true
+  ## @param auth.rootUser MongoDB(&reg;) root user
+  ##
+  rootUser: mongo
+  ## @param auth.rootPassword MongoDB(&reg;) root password
+  ## ref: https://github.com/bitnami/bitnami-docker-mongodb/blob/master/README.md#setting-the-root-password-on-first-run
+  ##
+  rootPassword: "root"
+  
+  username: "mongo_otus"
+  password: "mongo_otus"
+  database: "otus"
+  ## @param auth.replicaSetKey Key used for authentication in the replicaset (only when `architecture=replicaset`)
+  ##
+  replicaSetKey: "+MB1wQnSY7YsS3T5LSRpjkTB/hMOx17D4X7h1EVXK0oYuKwcOMeWksUcjt4dJ9bd
+jrvzxlPl1n5p8+WAZXmT0m9Xzd55OgkXW9xpJuhfV7lj2ThHW2LXPM/HpSUcDYEE
+Qb8bknj68RAEHn/Lwvoo0V1vGfUXiKTEHkKnX5Q65lgieCRbGhTAy1yslCmlzKgZ
+530K9Rz0c0Vf5pI9Z6xMDd/DQorVW/NM4jN2zH1WgupdIYE+LG7hvgynENa8ZXck
+hulMZoy2v3/llk5MgwjDLru3Lb0gvwZtwzMTMcsIuiIkKbvf9yG0CC+CblE3aJKq
+H40EamolGWHOS2etcWz5Yb0wYQNWDA3EwXjH0zKSfVJe35tRX0gPgVYx9DjvzeCm
+f1zL+Fw6QeI+SayF/GfTuFfsUXiMl0Uk3e4dUzV9mwRbY324HU+VfGtB3dsMokI0
+Qw4hiIOsmrAq0fuJl2G8y4cNiXeZdpDU0icKTUD/pAH6S+u9ZtLRzSRRzIQrVnRJ
+ZU3HlSg/2JZhJacJl8eT9VvHkksrQ6OlIv19467lUmvt7hqOPDUeTtWj8EvJ0+b8
+m8BQ7rImR+KrZrOPgJewzY++qsy/WEsL/aKWyViVr52YBwpUX7ueAbsX9mJYG7YX
+qIRbuebopM0C3ZsJ/4ULLRRPhcyaXi7L1rkSuQF2ZXpdacwt67P6a4daki3aBtOn
+VPbT71LbyBIuQ7h4iV25umnEMV6/6gYbflj/ygy5iTyXsuaOC7+N2lvAK2eS0lm4
+PRj0RYce9fkS4i5yWIDcNuQ5meqLfi82VwgpGc7InOSFBWX3FEYWuB9kKaWyACv5
+hvcaSOFugNkie8jG5/Nuj4gb4rVsnyIJYh4ud55TIbIpnxv+PHk8YH/sONk0V0Fn
+SSOW44sdy+pVONMz7s8wx+PJK7fJXsV3oLrNNUuWC7833h94C7HT/x/Pq4uL14Xi
+Oy+4uci1szWIb4CGaNi7a7lxm+TyJUzGGs9kDVzM1JHCaWvX"
+  ## @param auth.existingSecret Existing secret with MongoDB(&reg;) credentials (keys: `mongodb-password`, `mongodb-root-password`, ` mongodb-replica-set-key`)
+  ## NOTE: When it's set the previous parameters are ignored.
+  ##
+
+replicaSetName: rs0
+## @param replicaSetHostnames Enable DNS hostnames in the replicaset config (only when `architecture=replicaset`)
+## Ignored when mongodb.architecture=standalone
+## Ignored when externalAccess.enabled=true
+##
+replicaSetHostnames: true
+## @param enableIPv6 Switch to enable/disable IPv6 on MongoDB(&reg;)
+## ref: https://github.com/bitnami/bitnami-docker-mongodb/blob/master/README.md#enabling/disabling-ipv6
+##
+
+
+replicaCount: 3
+## @param strategyType StrategyType for MongoDB(&reg;) statefulset
+## It can be set to RollingUpdate or Recreate by default.
+##
+
+## @param affinity MongoDB(&reg;) Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+## Note: podAffinityPreset, podAntiAffinityPreset, and nodeAffinityPreset will be ignored when it's set
+##
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - mongodb
+        topologyKey: "kubernetes.io/hostname"
+
+
+## Service parameters
+##
+service:
+  ## @param service.nameOverride MongoDB(&reg;) service name
+  ##
+  nameOverride: ""
+  ## @param service.type Kubernetes Service type
+  ##
+  type: NodePort
+  ## @param service.port MongoDB(&reg;) service port
+  ##
+  port: 27017
+  ## @param service.portName MongoDB(&reg;) service port name
+  ##
+  portName: mongodb
+  ## @param service.nodePort Port to bind to for NodePort and LoadBalancer service types
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
+  ##
+  nodePort: "32017"
+  ## @param service.clusterIP MongoDB(&reg;) service cluster IP
+  ## e.g:
+  ## clusterIP: None
+  ##
+  clusterIP: ""
+  ## @param service.externalIPs Specify the externalIP value ClusterIP service type.
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
+  ##
+  externalIPs: []
+  ## @param service.loadBalancerIP loadBalancerIP for MongoDB(&reg;) Service
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
+  ##
+  loadBalancerIP: ""
+  ## @param service.loadBalancerSourceRanges Address(es) that are allowed when service is LoadBalancer
+  ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+  ##
+  loadBalancerSourceRanges: []
+  ## @param service.annotations Provide any additional annotations that may be required
+  ##
+  annotations: {}
+## External Access to MongoDB(&reg;) nodes configuration
+##
+externalAccess:
+  ## @param externalAccess.enabled Enable Kubernetes external cluster access to MongoDB(&reg;) nodes (only for replicaset architecture)
+  ##
+  enabled: false
+  ## External IPs auto-discovery configuration
+  ## An init container is used to auto-detect LB IPs or node ports by querying the K8s API
+  ## Note: RBAC might be required
+  ##
+  
+  service:
+    ## @param externalAccess.service.type Kubernetes Service type for external access. Allowed values: NodePort, LoadBalancer or ClusterIP
+    ##
+    type: LoadBalancer
+    ## @param externalAccess.service.port MongoDB(&reg;) port used for external access when service type is LoadBalancer
+    ##
+    port: 27017
+    ## @param externalAccess.service.loadBalancerIPs Array of load balancer IPs for MongoDB(&reg;) nodes
+    ## Example:
+    ## loadBalancerIPs:
+    ##   - X.X.X.X
+    ##   - Y.Y.Y.Y
+    ##
+    loadBalancerIPs: []
+    ## @param externalAccess.service.loadBalancerSourceRanges Address(es) that are allowed when service is LoadBalancer
+    ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+    ## Example:
+    ## loadBalancerSourceRanges:
+    ## - 10.10.10.0/24
+    ##
+    loadBalancerSourceRanges: []
+    ## @param externalAccess.service.nodePorts Array of node ports used to configure MongoDB(&reg;) advertised hostname when service type is NodePort
+    ## Example:
+    ## nodePorts:
+    ##   - 30001
+    ##   - 30002
+    ##
+ 
+## Enable persistence using Persistent Volume Claims
+## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  ## @param persistence.enabled Enable MongoDB(&reg;) data persistence using PVC
+  ##
+  enabled: true
+  ## @param persistence.medium Provide a medium for `emptyDir` volumes.
+  ## Requires persistence.enabled: false
+  ##
+  medium: ""
+  ## @param persistence.existingClaim Provide an existing `PersistentVolumeClaim` (only when `architecture=standalone`)
+  ## Requires persistence.enabled: true
+  ## If defined, PVC must be created manually before volume will be bound
+  ## Ignored when mongodb.architecture=replicaset
+  ##
+  existingClaim: ""
+  ## @param persistence.storageClass PVC Storage Class for MongoDB(&reg;) data volume
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ## set, choosing the default provisioner.
+  ##
+  storageClass: ""
+  ## @param persistence.accessModes PV Access Mode
+  ##
+  accessModes:
+    - ReadWriteOnce
+  ## @param persistence.size PVC Storage Request for MongoDB(&reg;) data volume
+  ##
+  size: 20Gi
+  ## @param persistence.annotations PVC annotations
+  ##
+  annotations: {}
+  ## @param persistence.mountPath Path to mount the volume at
+  ## MongoDB(&reg;) images.
+  ##
+  mountPath: /bitnami/mongodb
+  ## @param persistence.subPath Subdirectory of the volume to mount at
+  ## and one PV for multiple services.
+  ##
+  subPath: ""
+  ## Fine tuning for volumeClaimTemplates
+  ##
+
+arbiter:
+  ## @param arbiter.enabled Enable deploying the arbiter
+  ##   https://docs.mongodb.com/manual/tutorial/add-replica-set-arbiter/
+  ##
+  enabled: false
+  ## @param arbiter.configuration Arbiter configuration file to be used
+  ##   http://docs.mongodb.org/manual/reference/configuration-options/
+  ##
+   
+metrics:
+  ## @param metrics.enabled Enable using a sidecar Prometheus exporter
+  ##
+  enabled: true
+  
+  resources:
+    ## Example:
+    ## limits:
+    ##    cpu: 100m
+    ##    memory: 128Mi
+    ##
+    limits: {}
+    ## Examples:
+    ## requests:
+    ##    cpu: 100m
+    ##    memory: 128Mi
+    ##
+    requests: {}
+  ## @param metrics.containerPort Port of the Prometheus metrics container
+  ##
+  containerPort: 9216
+  ## Prometheus Exporter service configuration
+  ##
+  service:
+    ## @param metrics.service.annotations [object] Annotations for Prometheus Exporter pods. Evaluated as a template.
+    ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+    ##
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "{{ .Values.metrics.service.port }}"
+      prometheus.io/path: "/metrics"
+    ## @param metrics.service.type Type of the Prometheus metrics service
+    ##
+    type: ClusterIP
+    ## @param metrics.service.port Port of the Prometheus metrics service
+    ##
+    port: 9216
+
+sidecars: 
+## @param sidecars Add additional sidecar containers for the MongoDB(&reg;) pod(s)
+## Example:
+  
+##   - name: your-image-name
+##     image: your-image
+##     imagePullPolicy: Always
+##     ports:
+##       - name: portname
+##         containerPort: 1234
+## This is an optional 'mongo-labeler' sidecar container that tracks replica-set for the primary mongodb pod
+## and labels it dynamically with ' primary: "true" ' in order for an extra-deployed service to always expose
+## and attach to the primary pod, this needs to be uncommented along with the suggested 'extraDeploy' example
+## and the suggested rbac example for the pod to be allowed adding labels to mongo replica pods
+## search 'mongo-labeler' through this file to find the sections that needs to be uncommented to make it work
+##
+  - name: mongo-labeler
+    image: korenlev/k8s-mongo-labeler-sidecar
+    imagePullPolicy: Always
+    env:
+      - name: LABEL_SELECTOR
+        value: "app.kubernetes.io/component=mongodb,app.kubernetes.io/instance=mongodb,app.kubernetes.io/name=mongodb"
+      - name: NAMESPACE
+        value: "mongo"
+      - name: DEBUG
+        value: "true"
+rbac:
+  ## @param rbac.create Whether to create & use RBAC resources or not
+  ## binding MongoDB(&reg;) ServiceAccount to a role
+  ## that allows MongoDB(&reg;) pods querying the K8s API
+  ## this needs to be set to 'true' to enable the mongo-labeler sidecar primary mongodb discovery
+  ##
+  create: true
+  role:
+    ## @param rbac.role.rules Custom rules to create following the role specification
+    ## The example below needs to be uncommented to use the 'mongo-labeler' sidecar for dynamic discovery of the primary mongodb pod:
+     rules:
+       - apiGroups:
+           - ""
+         resources:
+           - pods
+         verbs:
+           - get
+           - list
+           - watch
+           - update
+
+serviceMonitor:
+    ## @param metrics.serviceMonitor.enabled Create ServiceMonitor Resource for scraping metrics using Prometheus Operator
+    #
+    enabled: true
+    ## @param metrics.serviceMonitor.namespace Namespace which Prometheus is running in
+    ##
+    namespace: ""
+    ## @param metrics.serviceMonitor.interval Interval at which metrics should be scraped
+    ##
+    interval: 30s
+    ## @param metrics.serviceMonitor.scrapeTimeout Specify the timeout after which the scrape is ended
+    ## e.g:
+    ## scrapeTimeout: 30s
+    ##
+    scrapeTimeout: ""
+    ## @param metrics.serviceMonitor.relabellings RelabelConfigs to apply to samples before scraping.
+    ##
+    relabellings: []
+    ## @param metrics.serviceMonitor.metricRelabelings MetricsRelabelConfigs to apply to samples before ingestion.
+    ##
+    metricRelabelings: []
+    ## @param metrics.serviceMonitor.additionalLabels Used to pass Labels that are used by the Prometheus installed in your cluster to select Service Monitors to work with
+    ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#prometheusspec
+    ##
+    additionalLabels: 
+      release: "prometheus"
+  ## Custom PrometheusRule to be defined
+  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+  
+clusterDomain: cluster.local
+## @param extraDeploy Array of extra objects to deploy with the release
+extraDeploy:
+## This needs to be uncommented and added to 'extraDeploy' in order to use the replicaset 'mongo-labeler' sidecar
+## for dynamically discovering the mongodb primary pod
+## suggestion is to use a hard-coded and predictable TCP port for the primary mongodb pod (here is 30001, choose your own)
+ - apiVersion: v1
+   kind: Service
+   metadata:
+     name: mongodb-primary
+     namespace: mongo
+     labels:
+       app.kubernetes.io/component: mongodb
+       app.kubernetes.io/instance: mongodb
+       app.kubernetes.io/managed-by: Helm
+       app.kubernetes.io/name: mongodb
+   spec:
+     type: NodePort
+     externalTrafficPolicy: Cluster
+     ports:
+       - name: mongodb
+         port: 30001
+         nodePort: 30001
+         protocol: TCP
+         targetPort: mongodb
+     selector:
+       app.kubernetes.io/component: mongodb
+       app.kubernetes.io/instance: mongodb
+       app.kubernetes.io/name: mongodb
+       primary: "true"

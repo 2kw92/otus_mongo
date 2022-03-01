@@ -1,0 +1,234 @@
+-- mongo GKE - уменьшаем мощность машины и указываем только 1 зону 1 региона для уменьшения стоимости
+-- --cluster-version "1.21.5-gke.1302" (21/11/18)
+-- need to update in time
+gcloud beta container --project "celtic-house-266612" clusters create "mongo" --zone "us-central1-c" --no-enable-basic-auth --cluster-version "1.21.5-gke.1302" --release-channel "regular" --machine-type "e2-medium" --image-type "COS_CONTAINERD" --disk-type "pd-standard" --disk-size "20" --metadata disable-legacy-endpoints=true --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" --max-pods-per-node "110" --preemptible --num-nodes "3" --logging=SYSTEM,WORKLOAD --monitoring=SYSTEM --enable-ip-alias --network "projects/celtic-house-266612/global/networks/default" --subnetwork "projects/celtic-house-266612/regions/us-central1/subnetworks/default" --no-enable-intra-node-visibility --default-max-pods-per-node "110" --no-enable-master-authorized-networks --addons HorizontalPodAutoscaling,HttpLoadBalancing,GcePersistentDiskCsiDriver --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 --enable-shielded-nodes --node-locations "us-central1-c"
+
+NAME   LOCATION       MASTER_VERSION   MASTER_IP      MACHINE_TYPE  NODE_VERSION     NUM_NODES  STATUS
+mongo  us-central1-c  1.21.5-gke.1302  34.123.93.213  e2-medium     1.21.5-gke.1302  3          RUNNING
+
+gcloud container clusters list
+kubectl get all
+-- если делать через веб интерфейс ошибка, нужно переинициализировать кластер
+-- так как мы делали кластер не через gcloud, доступ мы не получим
+-- нужно прописать теперь контекст
+-- https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl
+gcloud container clusters get-credentials citus --zone us-central1-c
+
+-- посмотрим дефолтный тип стораджа 
+kubectl get storageclasses
+-- можем сделать свой - например для внешних дисков и т.д.
+
+
+
+-- 1. начнем percona helm chart
+-- https://github.com/bitnami/charts/tree/master/bitnami/mongodb 
+
+-- архитектура
+-- https://docs.bitnami.com/kubernetes/infrastructure/mongodb/get-started/understand-architecture/
+
+helm repo add bitnami https://charts.bitnami.com/bitnami
+cd /mnt/c/download/mongo
+-- To enable full TLS encryption, set the tls.enabled parameter to true
+nano my_values.yaml
+helm install mongo bitnami/mongodb --values my_values.yaml
+
+** Please be patient while the chart is being deployed **
+MongoDB&reg; can be accessed on the following DNS name(s) and ports from within your cluster:
+    mongo-mongodb-0.mongo-mongodb-headless.default.svc.cluster.local:27017
+    mongo-mongodb-1.mongo-mongodb-headless.default.svc.cluster.local:27017
+To get the root password run:
+    export MONGODB_ROOT_PASSWORD=$(kubectl get secret --namespace default mongo-mongodb -o jsonpath="{.data.mongodb-root-password}" | base64 --decode)
+To connect to your database, create a MongoDB&reg; client container:
+    kubectl run --namespace default mongo-mongodb-client --rm --tty -i --restart='Never' --env="MONGODB_ROOT_PASSWORD=$MONGODB_ROOT_PASSWORD" --image docker.io/bitnami/mongodb:4.4.11-debian-10-r12 --command -- bash
+Then, run the following command:
+    mongo admin --host "mongo-mongodb-0.mongo-mongodb-headless.default.svc.cluster.local:27017,mongo-mongodb-1.mongo-mongodb-headless.default.svc.cluster.local:27017" --authenticationDatabase admin -u root -p $MONGODB_ROOT_PASSWORD
+
+kubectl get all
+kubectl get pvc -o wide
+kubectl get pv -o wide
+
+kubectl describe service/mongo-mongodb-headless
+
+
+-- port forward in background
+-- https://www.golinuxcloud.com/kubectl-port-forward/#Perform_kubectl_port-forward_in_background
+kubectl port-forward service/mongo-mongodb-headless 27017:27017
+
+mongo
+rs.status()
+exit
+
+export MONGODB_ROOT_PASSWORD=$(kubectl get secret --namespace default mongo-mongodb -o jsonpath="{.data.mongodb-root-password}" | base64 --decode)
+echo $MONGODB_ROOT_PASSWORD
+mongo --authenticationDatabase admin -u root -p $MONGODB_ROOT_PASSWORD
+
+-- пороняем ноды
+
+-- Для доступа извне нужно юзать LoadBalancer. NodePort только для доступа изнутри GKE
+kubectl get all
+-- видим нет внешнего ip
+-- посмотрим лоад балансер
+-- перед этим нужно узнать какой селектор у подов
+kubectl describe pod/mongo-mongodb-0
+-- добавим селектор, так как не указали его в хелм чарте
+-- helm upgrade mongo bitnami/mongodb --set auth.rootPassword=$MONGODB_ROOT_PASSWORD --set podLabels="{app:mongo}"
+
+nano service.yaml
+kubectl apply -f service.yaml
+kubectl describe service mongo
+mongo --authenticationDatabase admin -u root -p $MONGODB_ROOT_PASSWORD --host 104.197.28.238
+
+
+
+-- обратите внимание, что при удалении чарта и установке pvc старые подключатся и пароль будет старый, а не тот что в секретах!!!
+helm uninstall mongo
+
+-- не заыбваем про
+kubectl get pvc -o wide
+kubectl get pv -o wide
+kubectl delete pvc --all
+kubectl delete -f service.yaml
+
+
+-- 2. автоматизируем раскатывания чарта
+https://github.com/aeuge/mongo_k8s_deploy
+cd /mnt/c/download/mongo
+-- git clone по ssh , а не https для внесения изменений !
+git clone git@github.com:aeuge/mongo_k8s_deploy
+cd mongo_k8s_deploy/
+cat values_old.yaml
+
+-- достанем последний values.yaml
+-- cd ..
+-- git clone https://github.com/bitnami/charts
+-- cd bitnami/mongodb 
+-- cat charts/bitnami/mongodb/values.yaml
+
+-- уже достал. сравним размеры изменений за полтора года )
+ls -l
+nano my_values.yaml
+nano new-mongodb.sh
+./new-mongodb.sh
+
+-- обратите внимание, что при удалении чарта и установке pvc старые подключатся и пароль будет старый, а не тот что в секретах!!!
+helm uninstall otus-mongodb
+kubectl delete namespace otus-mongodb
+
+-- не забываем про
+kubectl get pvc -A -o wide
+kubectl get pv -A -o wide
+kubectl delete pvc --all
+kubectl delete pvc --all -A
+-- а нет у нас pvc
+-- добавим персистенс
+nano my_values.yaml
+
+-- и пересоздадим чарт
+./new-mongodb.sh
+
+-- и чет не создаются
+-- otus-mongodb   statefulset.apps/otus-mongodb           1/3
+-- kubectl describe statefulset.apps/otus-mongodb -notus-mongodb
+-- а не потупил и норм)
+
+-- отключим персистенс
+
+-- посмотрим что осталось от кластера при удалении
+
+
+
+
+-- 3. mongo community operator
+-- https://github.com/mongodb/mongodb-kubernetes-operator 
+
+
+-- mongo operator
+-- посмотрим существующие уже ресурсы
+kubectl api-resources
+cd /mnt/c/download/mongo
+
+git clone https://github.com/mongodb/mongodb-kubernetes-operator.git
+cd mongodb-kubernetes-operator/
+
+kubectl create namespace mongoo
+/* -- нужна очень тонкая настройка прав в кластере
+-- create cluster-wide roles and role-bindings 
+kubectl apply -f deploy/clusterwide --namespace mongoo
+
+-- For each namespace
+kubectl apply -k config/rbac --namespace mongoo
+-- базовые настройки
+kubectl apply -f config/crd/bases/mongodbcommunity.mongodb.com_mongodbcommunity.yaml --namespace mongoo
+-- verify
+kubectl get crd/mongodbcommunity.mongodbcommunity.mongodb.com --namespace mongoo
+
+-- создадим оператор
+kubectl create -f config/manager/manager.yaml --namespace mongoo
+* /
+
+
+
+-- 4. percona mongo operator
+-- https://operatorhub.io/operator/percona-server-mongodb-operator
+-- https://www.percona.com/doc/kubernetes-operator-for-psmongodb/index.html
+
+cd /mnt/c/download/mongo
+git clone -b v1.11.0 https://github.com/percona/percona-server-mongodb-operator
+cd percona-server-mongodb-operator
+
+-- The Custom Resource Definition extends the standard set of resources which Kubernetes “knows” about with the new items, 
+-- in our case these items are the core of the operator.
+cat deploy/crd.yaml
+kubectl apply -f deploy/crd.yaml
+
+kubectl create namespace mongoop
+kubectl config set-context $(kubectl config current-context) --namespace=mongoop
+
+-- создаем привязку роли
+kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud config get-value core/account)
+
+-- создаем РБАК
+cat deploy/rbac.yaml
+kubectl apply -f deploy/rbac.yaml
+
+-- create operator
+cat deploy/operator.yaml
+kubectl apply -f deploy/operator.yaml
+
+-- посмотрим на новые ресурсы
+kubectl api-resources | grep mongo
+
+-- идем в дефолтный неймспейс
+kubectl config set-context $(kubectl config current-context) --namespace=mongoop
+
+-- задаим пароли
+cat deploy/secrets.yaml
+kubectl create -f deploy/secrets.yaml
+
+-- deploy minimal cluster - уменьшаем бюджеты, а то не влезем
+nano deploy/cr.yaml
+kubectl apply -f deploy/cr.yaml
+
+kubectl get all
+
+-- зайдем клиентом
+kubectl run -i --rm --tty percona-client --image=percona/percona-server-mongodb:4.4.10-11 --restart=Never -- bash -il
+mongo "mongodb://clusterAdmin:clusterAdmin123456@my-cluster-name-mongos.mongoop.svc.cluster.local/admin?ssl=false"
+
+-- про шардинг
+-- https://www.percona.com/doc/kubernetes-operator-for-psmongodb/sharding.html
+-- про tls
+-- https://www.percona.com/doc/kubernetes-operator-for-psmongodb/TLS.html
+
+
+-- удалим кластер
+gcloud container clusters delete mongo --zone us-central1-c
+
+
+--посмотрим, что осталось от кластера
+gcloud compute disks list
+
+
+
+
+
