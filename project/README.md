@@ -7,7 +7,9 @@
 `https://plugins.qgis.org/plugins/MongoConnector/`. Поссле его загрузки и настройки коннекта,мы       
 можем загружать данные непосредственно из нашей бд.
 
-Так же необходимо открыть порты для соединения с бд в google platform. Создаем новое правило firewall add rule
+Так же необходимо открыть порты для соединения с бд в google platform. Создаем новое правило firewall add rule.
+
+Переходим к импорту необходимых слоев
 
 root@mongo1:~# mongoimport -d geodb -h mongo4:27000 -c roads --jsonArray  -u userroot --authenticationDatabase admin --file /root/roads_line.geojson
 Enter password:
